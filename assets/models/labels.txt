@@ -1,0 +1,8 @@
+0-Kembung Busuk
+1-Kembung Sangat Busuk
+2-Kembung Sangat Segar
+3-Kembung Segar
+4-Selar Como Busuk
+5-Selar Como Sangat Busuk
+6-Selar Como Sangat Segar
+7-Selar Como Segar
