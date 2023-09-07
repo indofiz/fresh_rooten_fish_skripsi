@@ -2,7 +2,7 @@ name: fresh_rooten_fish_skripsi
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.1 <4.0.0"
+  sdk: '>=3.1.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,6 +36,18 @@ dependencies:
   path: ^1.8.3
   path_provider: ^2.0.15
   tflite_flutter: ^0.10.1
+  image_cropper: ^5.0.0
+  animated_bottom_navigation_bar: ^1.2.0
+  ionicons: ^0.2.2
+  intl: ^0.17.0
+  flutter_slidable: ^2.0.0
+  shared_preferences: ^2.2.1
+  lottie: ^2.6.0
+  google_fonts: ^5.1.0
+  firebase_core: ^2.15.1
+  firebase_storage: ^11.2.6
+  cloud_firestore: ^4.9.1
+  flutter_html: ^3.0.0-beta.2
 
 dev_dependencies:
   flutter_test:
@@ -47,11 +59,14 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/
     - assets/images/
+    - assets/lottie/
+    - assets/ikan/
     - assets/models/
 
 flutter_launcher_icons:
-  image_path: "assets/images/logo.png"
-  android: "ic_launcher"
+  image_path: 'assets/images/logo.png'
+  android: 'ic_launcher'
   ios: true
   remove_alpha_ios: true
