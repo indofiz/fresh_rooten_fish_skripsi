@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1006477152938",
+    "project_id": "ikansegar-dc95a",
+    "storage_bucket": "ikansegar-dc95a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006477152938:android:7ac8ab5be3643d6329b6d3",
+        "android_client_info": {
+          "package_name": "com.example.fresh_rooten_fish_skripsi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1006477152938-d2mvqhqrptoru0rkkp8uqp39eiied94h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLT8ueHEcEXhcpZVyT4yZdbP-Xb7os3Hw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1006477152938-d2mvqhqrptoru0rkkp8uqp39eiied94h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006477152938:android:e428474777ffc59d29b6d3",
+        "android_client_info": {
+          "package_name": "com.example.ikan_laut_skripsi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1006477152938-d2mvqhqrptoru0rkkp8uqp39eiied94h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLT8ueHEcEXhcpZVyT4yZdbP-Xb7os3Hw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1006477152938-d2mvqhqrptoru0rkkp8uqp39eiied94h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

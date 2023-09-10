@@ -97,12 +97,12 @@ class _PageHomeState extends State<PageHome> {
   }
 
   Widget ciriIkan() {
-    return Column(
+    return const Column(
       children: [
-        const SizedBox(
+        SizedBox(
           height: 24,
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(bottom: 12),
           child: TitleSection(
             title: 'Ikan Apa Saja?',
@@ -113,7 +113,7 @@ class _PageHomeState extends State<PageHome> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: const [
+          children: [
             CardCiri(
                 image: 'assets/images/selar_como.png',
                 title: 'Selar Como',
@@ -125,10 +125,10 @@ class _PageHomeState extends State<PageHome> {
             ),
           ],
         ),
-        const SizedBox(
+        SizedBox(
           height: 32,
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(bottom: 12),
           child: TitleSection(
             title: 'Riwayat Identifikasi',

@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: bgColor,
       body: SingleChildScrollView(
-        physics: const NeverScrollableScrollPhysics(),
+        // physics: const NeverScrollableScrollPhysics(),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

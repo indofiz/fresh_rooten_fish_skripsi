@@ -5,19 +5,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
-import 'package:ikan_laut_skripsi_v2/classifier/classifier.dart';
-import 'package:ikan_laut_skripsi_v2/classifier/classifier_quant.dart';
-import 'package:ikan_laut_skripsi_v2/pages/hasil_klasifikasi.dart';
-import 'package:ikan_laut_skripsi_v2/pages/home.dart';
-import 'package:ikan_laut_skripsi_v2/pages/riwayat.dart';
-import 'package:ikan_laut_skripsi_v2/theme/colors.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:logger/logger.dart';
-import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
+import 'pages/hasil_klasifikasi.dart';
 import 'pages/home.dart';
+import 'pages/riwayat.dart';
 import 'theme/colors.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,23 +26,17 @@ class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
   final ImagePicker _picker = ImagePicker();
   UploadTask? uploadTask;
-  late Classifier _classifier;
-
-  var logger = Logger();
 
   File? _image;
   File? _imageCropped;
 
   img.Image? fox;
 
-  Category? category;
-
   bool imageSelect = false;
 
   @override
   void initState() {
     super.initState();
-    _classifier = ClassifierQuant();
   }
 
   Future<void> pickImage(ImageSource type) async {
@@ -87,45 +75,45 @@ class _HomePageState extends State<HomePage> {
         _image = File(croppedFile.path);
         print(_image);
         if (_image != null) {
-          _predict();
+          // _predict();
         }
       });
     }
   }
 
-  void _predict() async {
-    img.Image imageInput = img.decodeImage(_image!.readAsBytesSync())!;
-    var pred = _classifier.predict(imageInput);
-    var labelRaw = pred.label;
-    final info = labelRaw.split('-');
-    Map<String, dynamic> predik = {
-      'index': int.parse(info[0]),
-      'jenis': info[1],
-      'label': info[2],
-      'confidence': pred.score
-    };
-    List<Map> hasilPrediksi = [predik];
-    // print(hasilPrediksi);
-    setState(() {
-      imageSelect = true;
-    });
-    await Future.delayed(
-      const Duration(milliseconds: 300),
-      () => {
-        if (_image != null)
-          {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    HasilKlasifikasi(image: _image!, prediksi: hasilPrediksi),
-              ),
-            )
-          }
-      },
-    );
-    // uploadImage(image, recognitions!);
-  }
+  // void _predict() async {
+  //   img.Image imageInput = img.decodeImage(_image!.readAsBytesSync())!;
+  //   var pred = _classifier.predict(imageInput);
+  //   var labelRaw = pred.label;
+  //   final info = labelRaw.split('-');
+  //   Map<String, dynamic> predik = {
+  //     'index': int.parse(info[0]),
+  //     'jenis': info[1],
+  //     'label': info[2],
+  //     'confidence': pred.score
+  //   };
+  //   List<Map> hasilPrediksi = [predik];
+  //   // print(hasilPrediksi);
+  //   setState(() {
+  //     imageSelect = true;
+  //   });
+  //   await Future.delayed(
+  //     const Duration(milliseconds: 300),
+  //     () => {
+  //       if (_image != null)
+  //         {
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) =>
+  //                   HasilKlasifikasi(image: _image!, prediksi: hasilPrediksi),
+  //             ),
+  //           )
+  //         }
+  //     },
+  //   );
+  //   // uploadImage(image, recognitions!);
+  // }
 
   @override
   Widget build(BuildContext context) {
