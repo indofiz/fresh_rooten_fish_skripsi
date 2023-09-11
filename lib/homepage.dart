@@ -13,6 +13,7 @@ import 'pages/hasil_klasifikasi.dart';
 import 'pages/home.dart';
 import 'pages/riwayat.dart';
 import 'theme/colors.dart';
+import '../helper/image_classification_helper.dart';
 
 class HomePage extends StatefulWidget {
   final String email;
@@ -24,7 +25,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
+  ImageClassificationHelper? imageClassificationHelper;
   final ImagePicker _picker = ImagePicker();
+  String? imagePath;
+  Map<String, double>? classification;
+
   UploadTask? uploadTask;
 
   File? _image;
@@ -36,7 +41,22 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    imageClassificationHelper = ImageClassificationHelper();
+    imageClassificationHelper!.initHelper();
     super.initState();
+  }
+
+  void cleanResult() {
+    imagePath = null;
+    fox = null;
+    classification = null;
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    imageClassificationHelper?.close();
+    super.dispose();
   }
 
   Future<void> pickImage(ImageSource type) async {
@@ -78,6 +98,19 @@ class _HomePageState extends State<HomePage> {
           // _predict();
         }
       });
+    }
+  }
+
+  Future<void> processImage() async {
+    if (imagePath != null) {
+      // Read image bytes from file
+      final imageData = File(imagePath!).readAsBytesSync();
+
+      // Decode image using package:image/image.dart (https://pub.dev/image)
+      fox = img.decodeImage(imageData);
+      setState(() {});
+      classification = await imageClassificationHelper?.inferenceImage(fox!);
+      setState(() {});
     }
   }
 
