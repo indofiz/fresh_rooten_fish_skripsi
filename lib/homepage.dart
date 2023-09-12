@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
@@ -92,10 +93,12 @@ class _HomePageState extends State<HomePage> {
       String fileName = croppedFile.path.split('/').last;
 
       setState(() {
-        _image = File(croppedFile.path);
-        print(_image);
-        if (_image != null) {
+        // _image = File(croppedFile.path);
+        imagePath = croppedFile.path;
+        // print(imagePath);
+        if (imagePath != null) {
           // _predict();
+          processImage();
         }
       });
     }
@@ -110,6 +113,8 @@ class _HomePageState extends State<HomePage> {
       fox = img.decodeImage(imageData);
       setState(() {});
       classification = await imageClassificationHelper?.inferenceImage(fox!);
+      String jsonString = jsonEncode(classification);
+      print(jsonString);
       setState(() {});
     }
   }
