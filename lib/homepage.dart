@@ -120,6 +120,7 @@ class _HomePageState extends State<HomePage> {
         final topClassification = classification?.entries
             .map((e) => Prediction(e.key, e.value))
             .toList();
+        print(topClassification);
       }
       setState(() {});
     }
