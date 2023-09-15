@@ -117,15 +117,9 @@ class _HomePageState extends State<HomePage> {
       setState(() {});
       classification = await imageClassificationHelper?.inferenceImage(fox!);
       if (classification != null) {
-        (classification!.entries.toList()
-              ..sort(
-                (a, b) => a.value.compareTo(b.value),
-              ))
-            .reversed
-            .take(1)
-            .map((e) =>
-                outputClassification = {'label': e.key, 'value': e.value});
-        print(outputClassification);
+        final topClassification = classification?.entries
+            .map((e) => Prediction(e.key, e.value))
+            .toList();
       }
       setState(() {});
     }
@@ -352,5 +346,16 @@ class _HomePageState extends State<HomePage> {
           ),
         )) ??
         false;
+  }
+}
+
+class Prediction {
+  String label;
+  double value;
+
+  Prediction(this.label, this.value);
+  @override
+  String toString() {
+    return '{ $label, $value }';
   }
 }
