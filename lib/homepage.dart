@@ -30,6 +30,8 @@ class _HomePageState extends State<HomePage> {
   final ImagePicker _picker = ImagePicker();
   String? imagePath;
   Map<String, double>? classification;
+  Map<String, dynamic>? outputClassification;
+  // Iterable<MapEntry<String, double>>? singleClassification;
 
   UploadTask? uploadTask;
 
@@ -61,6 +63,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> pickImage(ImageSource type) async {
+    cleanResult();
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: type,
@@ -113,8 +116,17 @@ class _HomePageState extends State<HomePage> {
       fox = img.decodeImage(imageData);
       setState(() {});
       classification = await imageClassificationHelper?.inferenceImage(fox!);
-      String jsonString = jsonEncode(classification);
-      print(jsonString);
+      if (classification != null) {
+        (classification!.entries.toList()
+              ..sort(
+                (a, b) => a.value.compareTo(b.value),
+              ))
+            .reversed
+            .take(1)
+            .map((e) =>
+                outputClassification = {'label': e.key, 'value': e.value});
+        print(outputClassification);
+      }
       setState(() {});
     }
   }
