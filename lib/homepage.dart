@@ -1,5 +1,6 @@
-import 'dart:convert';
 import 'dart:io';
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   UploadTask? uploadTask;
 
   File? _image;
-  File? _imageCropped;
+  // File? _imageCropped;
 
   img.Image? fox;
 
@@ -53,6 +54,7 @@ class _HomePageState extends State<HomePage> {
     imagePath = null;
     fox = null;
     classification = null;
+    _image = null;
     setState(() {});
   }
 
@@ -93,10 +95,10 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (croppedFile != null) {
-      String fileName = croppedFile.path.split('/').last;
+      // String fileName = croppedFile.path.split('/').last;
 
       setState(() {
-        // _image = File(croppedFile.path);
+        _image = File(croppedFile.path);
         imagePath = croppedFile.path;
         // print(imagePath);
         if (imagePath != null) {
@@ -117,10 +119,33 @@ class _HomePageState extends State<HomePage> {
       setState(() {});
       classification = await imageClassificationHelper?.inferenceImage(fox!);
       if (classification != null) {
-        final topClassification = classification?.entries
-            .map((e) => Prediction(e.key, e.value))
-            .toList();
-        print(topClassification);
+        final topClassification = getTopProbability(classification!);
+        var label = topClassification.key;
+        var confidence = topClassification.value;
+        final info = label.split('-');
+
+        Map<String, dynamic> predik = {
+          'index': int.parse(info[0]),
+          'jenis': info[1],
+          'label': info[2],
+          'confidence': confidence
+        };
+        List<Map> hasilPrediksi = [predik];
+        await Future.delayed(
+          const Duration(milliseconds: 300),
+          () => {
+            if (_image != null)
+              {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HasilKlasifikasi(
+                        image: _image!, prediksi: hasilPrediksi),
+                  ),
+                )
+              }
+          },
+        );
       }
       setState(() {});
     }
@@ -290,14 +315,7 @@ class _HomePageState extends State<HomePage> {
   Widget getBody() {
     return IndexedStack(
       index: pageIndex,
-      children: [
-        Center(
-          child: PageHome(email: widget.email),
-        ),
-        Center(
-          child: Riwayat(email: widget.email),
-        )
-      ],
+      children: [PageHome(email: widget.email), Riwayat(email: widget.email)],
     );
   }
 
@@ -347,6 +365,23 @@ class _HomePageState extends State<HomePage> {
           ),
         )) ??
         false;
+  }
+}
+
+MapEntry<String, double> getTopProbability(Map<String, double> labeledProb) {
+  var pq = PriorityQueue<MapEntry<String, double>>(compare);
+  pq.addAll(labeledProb.entries);
+
+  return pq.first;
+}
+
+int compare(MapEntry<String, double> e1, MapEntry<String, double> e2) {
+  if (e1.value > e2.value) {
+    return -1;
+  } else if (e1.value == e2.value) {
+    return 0;
+  } else {
+    return 1;
   }
 }
 

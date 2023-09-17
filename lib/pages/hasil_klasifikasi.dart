@@ -59,7 +59,7 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
   void initState() {
     super.initState();
     uploadImage(widget.image, widget.prediksi);
-    print(widget.prediksi);
+    // print(widget.prediksi);
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
         _isLoading = false;
@@ -120,12 +120,15 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
             const SizedBox(
               height: 24,
             ),
-            Text(
-              widget.prediksi[0]['label'],
-              style: TextStyle(
-                color: warna[widget.prediksi[0]['index']],
-                fontWeight: FontWeight.w600,
-                fontSize: 40,
+            Center(
+              child: Text(
+                widget.prediksi[0]['label'],
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: warna[widget.prediksi[0]['index']],
+                  fontWeight: FontWeight.w600,
+                  fontSize: 40,
+                ),
               ),
             ),
             const SizedBox(
@@ -133,10 +136,20 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
             ),
             Text(
               "Jenis Ikan ${widget.prediksi[0]['jenis']}",
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: black.withOpacity(0.8),
                 fontWeight: FontWeight.w500,
                 fontSize: 24,
+              ),
+            ),
+            Text(
+              "Confidence: ${widget.prediksi[0]['confidence'].toStringAsFixed(4)}",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: black.withOpacity(0.8),
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
               ),
             ),
             const SizedBox(

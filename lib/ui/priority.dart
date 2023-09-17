@@ -21,8 +21,6 @@ void main() {
 MapEntry<String, double> getTopProbability(Map<String, double> labeledProb) {
   var pq = PriorityQueue<MapEntry<String, double>>(compare);
   pq.addAll(labeledProb.entries);
-  print('LIST PRIORITY');
-  print(pq);
 
   return pq.first;
 }

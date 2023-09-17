@@ -2,7 +2,7 @@ name: fresh_rooten_fish_skripsi
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  sdk: ">=3.1.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -54,7 +54,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   build_runner: ^2.4.4
-  flutter_launcher_icons:
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
@@ -66,7 +66,7 @@ flutter:
     - assets/models/
 
 flutter_launcher_icons:
-  image_path: 'assets/images/logo.png'
-  android: 'ic_launcher'
+  image_path: "assets/images/logo.png"
+  android: "ic_launcher"
   ios: true
   remove_alpha_ios: true

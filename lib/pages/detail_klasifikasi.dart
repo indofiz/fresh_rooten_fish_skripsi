@@ -115,12 +115,15 @@ class _DetailKlasifikasiState extends State<DetailKlasifikasi> {
             const SizedBox(
               height: 24,
             ),
-            Text(
-              prediksi.prediksi[0]['label'].toString(),
-              style: TextStyle(
-                color: warna[prediksi.prediksi[0]['index']],
-                fontWeight: FontWeight.w600,
-                fontSize: 40,
+            Center(
+              child: Text(
+                prediksi.prediksi[0]['label'].toString(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: warna[prediksi.prediksi[0]['index']],
+                  fontWeight: FontWeight.w600,
+                  fontSize: 40,
+                ),
               ),
             ),
             const SizedBox(
@@ -128,10 +131,20 @@ class _DetailKlasifikasiState extends State<DetailKlasifikasi> {
             ),
             Text(
               "Jenis Ikan ${prediksi.prediksi[0]['jenis'].toString()}",
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: black.withOpacity(0.8),
                 fontWeight: FontWeight.w500,
                 fontSize: 24,
+              ),
+            ),
+            Text(
+              "Confidence: ${prediksi.prediksi[0]['confidence'].toStringAsFixed(4)}",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: black.withOpacity(0.8),
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
               ),
             ),
             const SizedBox(
