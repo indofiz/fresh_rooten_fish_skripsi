@@ -218,7 +218,7 @@ class _PageHomeState extends State<PageHome> {
                                       );
                                     },
                                     child: Text(
-                                      'LOGOUT & RESET EMAIL',
+                                      'KELUAR & RESET EMAIL',
                                       style: TextStyle(color: white),
                                     ),
                                   ),
