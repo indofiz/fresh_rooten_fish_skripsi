@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:fresh_rooten_fish_skripsi/components/title_section.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,15 +12,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image/image.dart' as img;
 
 import '../components/prediksi.dart';
+import '../helper/image_classification_helper.dart';
 import '../theme/colors.dart';
+
+import 'package:image/image.dart' as img;
 
 // import 'package:tflite/tflite.dart';
 
 class HasilKlasifikasi extends StatefulWidget {
-  final File image;
-  final List prediksi;
-  const HasilKlasifikasi(
-      {super.key, required this.image, required this.prediksi});
+  final String? image;
+  const HasilKlasifikasi({super.key, required this.image});
 
   @override
   State<HasilKlasifikasi> createState() => _HasilKlasifikasiState();
@@ -26,6 +29,22 @@ class HasilKlasifikasi extends StatefulWidget {
 
 class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
   UploadTask? uploadTask;
+
+  ImageClassificationHelper? imageClassificationHelper;
+  Map<String, double>? classification;
+  Map<String, dynamic>? outputClassification;
+  final gemini = Gemini.instance;
+
+  List<Map>? hasilPrediksi;
+
+  img.Image? fox;
+
+  String? searchedText, result;
+  bool _loading = false;
+
+  bool get loading => _loading;
+
+  set loading(bool set) => setState(() => _loading = set);
 
   List<Color> warna = [
     busuk,
@@ -43,7 +62,7 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
 
   var ikanBusuk =
       'Ikan yang tidak segar atau membusuk berisiko membawa penyakit dan bisa membuat seseorang keracunan makanan. Sebabnya, daging ikan yang membusuk bisa jadi tempat berkembang biak bakteri.';
-  bool _isLoading = true;
+
   List<Color> warnaCon = [
     busuk,
     sangatBusuk,
@@ -57,14 +76,18 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
 
   @override
   void initState() {
+    imageClassificationHelper = ImageClassificationHelper();
+    imageClassificationHelper!.initHelper();
+
     super.initState();
-    uploadImage(widget.image, widget.prediksi);
-    // print(widget.prediksi);
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        _isLoading = false;
-      });
-    });
+    // uploadImage(File(widget.image), hasilPrediksi?);
+    geminiProses(widget.image);
+  }
+
+  @override
+  void dispose() {
+    imageClassificationHelper?.close();
+    super.dispose();
   }
 
   @override
@@ -73,7 +96,16 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
       color: white,
       child: SafeArea(
         child: Scaffold(
-          body: SingleChildScrollView(child: bodyHasil()),
+          body: SingleChildScrollView(
+              child: loading
+                  ? Text('loading')
+                  : result != null
+                      ? (widget.image != null &&
+                              result != null &&
+                              result!.toLowerCase().contains(RegExp('yes'), 0))
+                          ? Text("Jenis Ikan ${hasilPrediksi?[0]['jenis']}")
+                          : null
+                      : Text('Kosong')),
           bottomNavigationBar: bottomNavBar(),
         ),
       ),
@@ -106,10 +138,11 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
                   maxWidth: 260,
                   maxHeight: 260,
                 ),
-                child: !_isLoading
+                child: !loading
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.file(widget.image, fit: BoxFit.cover),
+                        child:
+                            Image.file(File(widget.image!), fit: BoxFit.cover),
                       )
                     : const Padding(
                         padding: EdgeInsets.all(24),
@@ -121,37 +154,43 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
               height: 24,
             ),
             Center(
-              child: Text(
-                widget.prediksi[0]['label'],
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: warna[widget.prediksi[0]['index']],
-                  fontWeight: FontWeight.w600,
-                  fontSize: 40,
-                ),
-              ),
+              child: hasilPrediksi != null
+                  ? Text(
+                      hasilPrediksi?[0]['label'],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: warna[hasilPrediksi?[0]['index']],
+                        fontWeight: FontWeight.w600,
+                        fontSize: 40,
+                      ),
+                    )
+                  : Text('no hasil'),
             ),
             const SizedBox(
               height: 4,
             ),
-            Text(
-              "Jenis Ikan ${widget.prediksi[0]['jenis']}",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: black.withOpacity(0.8),
-                fontWeight: FontWeight.w500,
-                fontSize: 24,
-              ),
-            ),
-            Text(
-              "Confidence: ${widget.prediksi[0]['confidence'].toStringAsFixed(4)}",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: black.withOpacity(0.8),
-                fontWeight: FontWeight.w500,
-                fontSize: 20,
-              ),
-            ),
+            hasilPrediksi != null
+                ? Text(
+                    "Jenis Ikan ${hasilPrediksi?[0]['jenis']}",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: black.withOpacity(0.8),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 24,
+                    ),
+                  )
+                : Text('No Data'),
+            hasilPrediksi != null
+                ? Text(
+                    "Confidence: ${hasilPrediksi?[0]['confidence'].toStringAsFixed(4)}",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: black.withOpacity(0.8),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20,
+                    ),
+                  )
+                : Text('No Data'),
             const SizedBox(
               height: 32,
             ),
@@ -165,7 +204,9 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
   Widget infoSaja() {
     return Container(
       decoration: BoxDecoration(
-          color: warnaCon[widget.prediksi[0]['index']].withOpacity(0.4),
+          color: hasilPrediksi != null
+              ? warnaCon[0].withOpacity(0.4)
+              : warnaCon[hasilPrediksi?[0]['index']].withOpacity(0.4),
           borderRadius: const BorderRadius.all(Radius.circular(12))),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
@@ -197,7 +238,7 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
               height: 8,
             ),
             Text(
-              widget.prediksi[0]['label'].toLowerCase().contains('segar')
+              hasilPrediksi?[0]['label'].toLowerCase().contains('segar')
                   ? ikanSegar
                   : ikanBusuk,
               style: TextStyle(color: black.withOpacity(0.8), fontSize: 13),
@@ -269,6 +310,20 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
         },
       );
 
+  Future<void> geminiProses(String? image) async {
+    if (image != null) {
+      final imageData = File(image).readAsBytesSync();
+      loading = true;
+      gemini.textAndImage(
+          text: 'YES or NO, is this fish eye?',
+          images: [imageData]).then((value) {
+        result = value?.content?.parts?.last.text;
+        loading = false;
+        processImage();
+      });
+    }
+  }
+
   Future uploadImage(File image, List prediksi) async {
     // RESIZE IMAGE
     String fileName = image.path.split('/').last;
@@ -312,5 +367,84 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
     setState(() {
       uploadTask = null;
     });
+  }
+
+  Future<void> processImage() async {
+    if (!loading) {
+      if (widget.image != null &&
+          result != null &&
+          result!.toLowerCase().contains(RegExp('yes'), 0)) {
+        final imageData = File(widget.image!).readAsBytesSync();
+
+        fox = img.decodeImage(imageData);
+        classification = await imageClassificationHelper?.inferenceImage(fox!);
+        if (classification != null) {
+          final topClassification = getTopProbability(classification!);
+          var label = topClassification.key;
+          var confidence = topClassification.value;
+          final info = label.split('-');
+
+          Map<String, dynamic> predik = {
+            'index': int.parse(info[0]),
+            'jenis': info[1],
+            'label': info[2],
+            'confidence': confidence
+          };
+
+          List<Map> hasilPrediksis = [predik];
+          uploadImage(File(widget.image!), hasilPrediksis);
+          hasilPrediksi = hasilPrediksis;
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            action: SnackBarAction(
+              label: 'Ok',
+              onPressed: () {
+                // Code to execute.
+              },
+            ),
+            content: const Text('Bukan Mata Ikan!'),
+            duration: const Duration(seconds: 3),
+            width: 300.0, // Width of the SnackBar.
+            padding: const EdgeInsets.only(
+              left: 12, // Inner padding for SnackBar content.
+            ),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+          ),
+        );
+      }
+    }
+  }
+}
+
+MapEntry<String, double> getTopProbability(Map<String, double> labeledProb) {
+  var pq = PriorityQueue<MapEntry<String, double>>(compare);
+  pq.addAll(labeledProb.entries);
+
+  return pq.first;
+}
+
+int compare(MapEntry<String, double> e1, MapEntry<String, double> e2) {
+  if (e1.value > e2.value) {
+    return -1;
+  } else if (e1.value == e2.value) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+class Prediction {
+  String label;
+  double value;
+
+  Prediction(this.label, this.value);
+  @override
+  String toString() {
+    return '{ $label, $value }';
   }
 }

@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image/image.dart' as img;
+
 import 'package:image_cropper/image_cropper.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,7 +14,6 @@ import 'pages/hasil_klasifikasi.dart';
 import 'pages/home.dart';
 import 'pages/riwayat.dart';
 import 'theme/colors.dart';
-import '../helper/image_classification_helper.dart';
 
 class HomePage extends StatefulWidget {
   final String email;
@@ -27,40 +25,28 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
-  ImageClassificationHelper? imageClassificationHelper;
+
   final ImagePicker _picker = ImagePicker();
+
   String? imagePath;
-  Map<String, double>? classification;
-  Map<String, dynamic>? outputClassification;
   // Iterable<MapEntry<String, double>>? singleClassification;
 
-  UploadTask? uploadTask;
-
-  File? _image;
-  // File? _imageCropped;
-
-  img.Image? fox;
-
-  bool imageSelect = false;
+  // Uint8List? selectedImage;
 
   @override
   void initState() {
-    imageClassificationHelper = ImageClassificationHelper();
-    imageClassificationHelper!.initHelper();
     super.initState();
   }
 
   void cleanResult() {
     imagePath = null;
-    fox = null;
-    classification = null;
-    _image = null;
+    // result = null;
+    // loading = true;
     setState(() {});
   }
 
   @override
   void dispose() {
-    imageClassificationHelper?.close();
     super.dispose();
   }
 
@@ -96,14 +82,18 @@ class _HomePageState extends State<HomePage> {
 
     if (croppedFile != null) {
       // String fileName = croppedFile.path.split('/').last;
-
       setState(() {
-        _image = File(croppedFile.path);
         imagePath = croppedFile.path;
         // print(imagePath);
         if (imagePath != null) {
           // _predict();
-          processImage();
+          // processImage();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HasilKlasifikasi(image: imagePath),
+            ),
+          );
         }
       });
     }
@@ -114,39 +104,63 @@ class _HomePageState extends State<HomePage> {
       // Read image bytes from file
       final imageData = File(imagePath!).readAsBytesSync();
 
-      // Decode image using package:image/image.dart (https://pub.dev/image)
-      fox = img.decodeImage(imageData);
-      setState(() {});
-      classification = await imageClassificationHelper?.inferenceImage(fox!);
-      if (classification != null) {
-        final topClassification = getTopProbability(classification!);
-        var label = topClassification.key;
-        var confidence = topClassification.value;
-        final info = label.split('-');
+      //   if (result != null &&
+      //       result!.toLowerCase().contains(RegExp('yes'), 0)) {
+      //     // Decode image using package:image/image.dart (https://pub.dev/image)
+      //     fox = img.decodeImage(imageData);
+      //     classification =
+      //         await imageClassificationHelper?.inferenceImage(fox!);
+      //     if (classification != null) {
+      //       final topClassification = getTopProbability(classification!);
+      //       var label = topClassification.key;
+      //       var confidence = topClassification.value;
+      //       final info = label.split('-');
 
-        Map<String, dynamic> predik = {
-          'index': int.parse(info[0]),
-          'jenis': info[1],
-          'label': info[2],
-          'confidence': confidence
-        };
-        List<Map> hasilPrediksi = [predik];
-        await Future.delayed(
-          const Duration(milliseconds: 300),
-          () => {
-            if (_image != null)
-              {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HasilKlasifikasi(
-                        image: _image!, prediksi: hasilPrediksi),
-                  ),
-                )
-              }
-          },
-        );
-      }
+      //       Map<String, dynamic> predik = {
+      //         'index': int.parse(info[0]),
+      //         'jenis': info[1],
+      //         'label': info[2],
+      //         'confidence': confidence
+      //       };
+      //       List<Map> hasilPrediksi = [predik];
+      //       await Future.delayed(
+      //         const Duration(milliseconds: 300),
+      //         () => {
+      //           if (_image != null)
+      //             {
+      //               Navigator.push(
+      //                 context,
+      //                 MaterialPageRoute(
+      //                   builder: (context) => HasilKlasifikasi(
+      //                       image: _image!, prediksi: hasilPrediksi),
+      //                 ),
+      //               )
+      //             }
+      //         },
+      //       );
+      //     }
+      //   } else {
+      //     ScaffoldMessenger.of(context).showSnackBar(
+      //       SnackBar(
+      //         action: SnackBarAction(
+      //           label: 'Ok',
+      //           onPressed: () {
+      //             // Code to execute.
+      //           },
+      //         ),
+      //         content: const Text('Bukan Mata Ikan!'),
+      //         duration: const Duration(seconds: 3),
+      //         width: 300.0, // Width of the SnackBar.
+      //         padding: const EdgeInsets.only(
+      //           left: 12, // Inner padding for SnackBar content.
+      //         ),
+      //         behavior: SnackBarBehavior.floating,
+      //         shape: RoundedRectangleBorder(
+      //           borderRadius: BorderRadius.circular(4.0),
+      //         ),
+      //       ),
+      //     );
+      //   }
       setState(() {});
     }
   }
@@ -197,6 +211,8 @@ class _HomePageState extends State<HomePage> {
             body: getBody(),
             floatingActionButton: FloatingActionButton(
               backgroundColor: primary,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
               onPressed: () {
                 showModalBottomSheet<void>(
                   context: context,
@@ -301,7 +317,10 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               tooltip: 'Ambil Gambar',
-              child: const Icon(Icons.camera_alt),
+              child: Icon(
+                Icons.camera_alt,
+                color: white,
+              ),
             ),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerDocked,

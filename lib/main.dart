@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,6 +14,7 @@ void main() async {
   final isEmail = pref.getBool('isEmail') ?? false;
   final email = pref.getString('email') ?? '';
   await Firebase.initializeApp();
+  Gemini.init(apiKey: 'AIzaSyCI1_RR-sRhSTvLal80SpauesAJy0Uc_18');
   runApp(MyApp(isEmail: isEmail, email: email));
 }
 
