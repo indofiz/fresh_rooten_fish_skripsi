@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:fresh_rooten_fish_skripsi/components/title_section.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image/image.dart' as img;
@@ -98,13 +99,28 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
         child: Scaffold(
           body: SingleChildScrollView(
               child: loading
-                  ? Text('loading')
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 200, bottom: 0),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                                width: 200,
+                                child:
+                                    Lottie.asset('assets/lottie/loader.json')),
+                            const Center(
+                              child: Text('Loading...'),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
                   : result != null
                       ? (widget.image != null &&
                               result != null &&
                               result!.toLowerCase().contains(RegExp('yes'), 0))
-                          ? Text("Jenis Ikan ${hasilPrediksi?[0]['jenis']}")
-                          : null
+                          ? bodyHasil(hasilPrediksi)
+                          : bodyHasilBukanIkan()
                       : Text('Kosong')),
           bottomNavigationBar: bottomNavBar(),
         ),
@@ -112,7 +128,7 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
     );
   }
 
-  Widget bodyHasil() {
+  Widget bodyHasil(data) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
@@ -154,12 +170,12 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
               height: 24,
             ),
             Center(
-              child: hasilPrediksi != null
+              child: data != null
                   ? Text(
-                      hasilPrediksi?[0]['label'],
+                      data?[0]['label'],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: warna[hasilPrediksi?[0]['index']],
+                        color: warna[data?[0]['index']],
                         fontWeight: FontWeight.w600,
                         fontSize: 40,
                       ),
@@ -169,9 +185,9 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
             const SizedBox(
               height: 4,
             ),
-            hasilPrediksi != null
+            data != null
                 ? Text(
-                    "Jenis Ikan ${hasilPrediksi?[0]['jenis']}",
+                    "Jenis Ikan ${data?[0]['jenis']}",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: black.withOpacity(0.8),
@@ -180,9 +196,9 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
                     ),
                   )
                 : Text('No Data'),
-            hasilPrediksi != null
+            data != null
                 ? Text(
-                    "Confidence: ${hasilPrediksi?[0]['confidence'].toStringAsFixed(4)}",
+                    "Confidence: ${data?[0]['confidence'].toStringAsFixed(4)}",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: black.withOpacity(0.8),
@@ -194,19 +210,83 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
             const SizedBox(
               height: 32,
             ),
-            infoSaja(),
+            infoSaja(data),
           ],
         ),
       ),
     );
   }
 
-  Widget infoSaja() {
+  Widget bodyHasilBukanIkan() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+        child: Column(
+          children: [
+            const TitleSection(
+              title: 'Hasil Klasifikasi',
+              subtitle:
+                  'Berikut adalah hasil identifikasi mata ikan yang berdasarkan foto.',
+            ),
+            const SizedBox(
+              height: 24,
+            ),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                  border: Border.all(color: black.withOpacity(0.3)),
+                  borderRadius: BorderRadius.circular(18)),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  minWidth: 240,
+                  minHeight: 240,
+                  maxWidth: 260,
+                  maxHeight: 260,
+                ),
+                child: !loading
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child:
+                            Image.file(File(widget.image!), fit: BoxFit.cover),
+                      )
+                    : const Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(),
+                      ),
+              ),
+            ),
+            const SizedBox(
+              height: 24,
+            ),
+            Center(
+                child: Text(
+              'BUKAN MATA IKAN!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: warna[0],
+                fontWeight: FontWeight.w600,
+                fontSize: 24,
+              ),
+            )),
+            const SizedBox(
+              height: 4,
+            ),
+            const SizedBox(
+              height: 32,
+            ),
+            infoBukanMata(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget infoSaja(hasilData) {
     return Container(
       decoration: BoxDecoration(
-          color: hasilPrediksi != null
+          color: hasilData != null
               ? warnaCon[0].withOpacity(0.4)
-              : warnaCon[hasilPrediksi?[0]['index']].withOpacity(0.4),
+              : warnaCon[hasilData?[0]['index']].withOpacity(0.4),
           borderRadius: const BorderRadius.all(Radius.circular(12))),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
@@ -238,9 +318,54 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
               height: 8,
             ),
             Text(
-              hasilPrediksi?[0]['label'].toLowerCase().contains('segar')
+              hasilData?[0]['label'].toLowerCase().contains('segar')
                   ? ikanSegar
                   : ikanBusuk,
+              style: TextStyle(color: black.withOpacity(0.8), fontSize: 13),
+              textAlign: TextAlign.justify,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget infoBukanMata() {
+    return Container(
+      decoration: BoxDecoration(
+          color: warnaCon[0].withOpacity(0.4),
+          borderRadius: const BorderRadius.all(Radius.circular(12))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.info_rounded,
+                  color: black,
+                  size: 20,
+                ),
+                const SizedBox(
+                  width: 4,
+                ),
+                Text(
+                  "Sekilas Info",
+                  style: TextStyle(
+                    color: black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Text(
+              'Silahkan Kembali dan Ambil gambar baru, disarankan menggunakan gambar mata ikan agar aplikasi bisa mendeteksi kesegarannya',
               style: TextStyle(color: black.withOpacity(0.8), fontSize: 13),
               textAlign: TextAlign.justify,
             ),
@@ -395,27 +520,6 @@ class _HasilKlasifikasiState extends State<HasilKlasifikasi> {
           uploadImage(File(widget.image!), hasilPrediksis);
           hasilPrediksi = hasilPrediksis;
         }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            action: SnackBarAction(
-              label: 'Ok',
-              onPressed: () {
-                // Code to execute.
-              },
-            ),
-            content: const Text('Bukan Mata Ikan!'),
-            duration: const Duration(seconds: 3),
-            width: 300.0, // Width of the SnackBar.
-            padding: const EdgeInsets.only(
-              left: 12, // Inner padding for SnackBar content.
-            ),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4.0),
-            ),
-          ),
-        );
       }
     }
   }
