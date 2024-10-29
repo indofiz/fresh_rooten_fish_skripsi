@@ -14,7 +14,7 @@ void main() async {
   final isEmail = pref.getBool('isEmail') ?? false;
   final email = pref.getString('email') ?? '';
   await Firebase.initializeApp();
-  Gemini.init(apiKey: 'AIzaSyCI1_RR-sRhSTvLal80SpauesAJy0Uc_18');
+  Gemini.init(apiKey: 'AIzaSyDPVGvYc3Oq_OhEnpkuOmUd4UTtSkWj5kc');
   runApp(MyApp(isEmail: isEmail, email: email));
 }
 
